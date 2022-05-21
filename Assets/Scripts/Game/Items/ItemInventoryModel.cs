@@ -26,21 +26,18 @@ namespace TeklySample.Game.Items
     public class InventoryItemModel : ObjectModel, ITickable
     {
         private readonly InventoryItem m_item;
-        
-        private readonly StringValueModel m_name = new StringValueModel("");
-        private readonly SpriteValueModel m_icon =  new SpriteValueModel();
 
-        private readonly NumberValueModel m_count = new NumberValueModel(0);
+        [ObjectModelField("name")] private readonly StringValueModel m_name = new StringValueModel("");
+        [ObjectModelField("icon")] private readonly SpriteValueModel m_icon =  new SpriteValueModel();
+        [ObjectModelField("count")] private readonly NumberValueModel m_count = new NumberValueModel(0);
         
         public InventoryItemModel(InventoryItem item)
         {
             m_item = item;
             m_name.Value = m_item.NameId;
             m_icon.Value = item.Icon;
-            
-            Add("name", m_name);
-            Add("icon", m_icon);
-            Add("count", m_count);
+         
+            AddSelf();
         }
 
         protected override void OnTick()

@@ -14,13 +14,12 @@ namespace TeklySample.Game.Generators
             get => m_count.Value;
         }
         
-        private readonly SpriteValueModel m_iconModel = new SpriteValueModel();
-        private readonly NumberValueModel m_count = new NumberValueModel(0);
+        [ObjectModelField("icon")] private readonly SpriteValueModel m_iconModel = new SpriteValueModel();
+        [ObjectModelField("count")] private readonly NumberValueModel m_count = new NumberValueModel(0);
 
         public ItemCountModel(ItemBalance itemBalance)
         {
-            Add("icon", m_iconModel);
-            Add("count", m_count);
+            AddSelf();
         }
     }
     
@@ -30,18 +29,18 @@ namespace TeklySample.Game.Generators
         private readonly GeneratorManager m_generatorManager;
         private readonly BuyMultiplier m_buyMultiplier;
 
-        private readonly StringValueModel m_name = new StringValueModel("");
-        private readonly NumberValueModel m_progress = new NumberValueModel(0);
-        private readonly NumberValueModel m_timeRemaining = new NumberValueModel(0);
-        private readonly NumberValueModel m_count = new NumberValueModel(0);
-        private readonly ButtonModel m_runButton = new ButtonModel();
-        private readonly SpriteValueModel m_iconModel = new SpriteValueModel();
+        [ObjectModelField("name")] private readonly StringValueModel m_name = new StringValueModel("");
+        [ObjectModelField("progress")] private readonly NumberValueModel m_progress = new NumberValueModel(0);
+        [ObjectModelField("timeremaining")] private readonly NumberValueModel m_timeRemaining = new NumberValueModel(0);
+        [ObjectModelField("count")] private readonly NumberValueModel m_count = new NumberValueModel(0);
+        [ObjectModelField("run")] private readonly ButtonModel m_runButton = new ButtonModel();
+        [ObjectModelField("icon")] private readonly SpriteValueModel m_iconModel = new SpriteValueModel();
         
-        private readonly NumberValueModel m_affordableCount = new NumberValueModel(0);
-        private readonly ButtonModel m_buyButton = new ButtonModel();
+        [ObjectModelField("affordable")] private readonly NumberValueModel m_affordableCount = new NumberValueModel(0);
+        [ObjectModelField("buy")] private readonly ButtonModel m_buyButton = new ButtonModel();
         
-        private readonly StringValueModel m_itemId = new StringValueModel("");
-        private readonly ItemCountModel m_generation;
+        [ObjectModelField("itemid")] private readonly StringValueModel m_itemId = new StringValueModel("");
+        [ObjectModelField("generation")] private readonly ItemCountModel m_generation;
 
         private readonly DisposableList m_disposableList = new DisposableList();
         
@@ -53,16 +52,7 @@ namespace TeklySample.Game.Generators
 
             m_generation = new ItemCountModel(generator.GenerationItem);
 
-            Add("name", m_name);
-            Add("progress", m_progress);
-            Add("count", m_count);
-            Add("run", m_runButton);
-            Add("buy", m_buyButton);
-            Add("timeremaining", m_timeRemaining);
-            Add("itemid", m_itemId);
-            Add("icon", m_iconModel);
-            Add("affordable", m_affordableCount);
-            Add("generation", m_generation);
+            AddSelf();
 
             m_name.Value = Localizer.Instance.Localize(generator.Balance.Item.NameId);
             m_itemId.Value = m_generator.InventoryItem.ItemId;

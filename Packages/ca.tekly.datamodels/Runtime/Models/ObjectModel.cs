@@ -2,8 +2,10 @@
 // Copyright 2021 Matt King
 // ============================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using Tekly.Common.Observables;
 
@@ -36,13 +38,17 @@ namespace Tekly.DataModels.Models
     
     public class ObjectModel : ModelBase
     {
+        private static readonly Dictionary<Type, List<(string Name, FieldInfo Field)>> cachedTypes = new Dictionary<Type, List<(string Name, FieldInfo Field)>>();
+        
         public IReadOnlyList<ModelReference> Models => m_models;
         
         public ITriggerable<ObjectModel> Modified => m_modified;
-        
+     
         private readonly Triggerable<ObjectModel> m_modified = new Triggerable<ObjectModel>();
 
         private readonly List<ModelReference> m_models = new List<ModelReference>(8);
+
+        private bool m_selfAdded;
 
         public void Add(string name, IModel model, ReferenceType referenceType = ReferenceType.Owner)
         {
@@ -50,6 +56,33 @@ namespace Tekly.DataModels.Models
             m_modified.Emit(this);
         }
 
+        public void AddSelf()
+        {
+            if (m_selfAdded) {
+                return;
+            }
+
+            if (cachedTypes.TryGetValue(GetType(), out var fieldList) == false) {
+                fieldList = new List<(string Name, FieldInfo Field)>();
+
+                foreach (var field in GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
+                    var attr = (ObjectModelField)field.GetCustomAttribute(typeof(ObjectModelField));
+                    if (attr != null) {
+                        fieldList.Add((attr.Id ?? field.Name, field));
+                    }
+                }
+
+                cachedTypes.Add(GetType(), fieldList);
+            }
+
+            foreach (var tmp in fieldList) {
+                var value = (IModel)tmp.Field.GetValue(this);
+                Add(tmp.Name, value);
+            }
+
+            m_selfAdded = true;
+        }
+        
         public void RemoveModel(string name)
         {
             for (var index = 0; index < m_models.Count; index++) {
